@@ -79,7 +79,6 @@ func main() {
 
 	for {
 		var message string
-		fmt.Print("Enter message: ")
 		fmt.Scanln(&message)
 
 		if message == "exit" {
@@ -96,7 +95,6 @@ func main() {
 			continue
 		}
 
-		log.Printf("Sent message: %s", message)
 	}
 
 	if err := stream.CloseSend(); err != nil {

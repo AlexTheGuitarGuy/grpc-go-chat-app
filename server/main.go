@@ -120,6 +120,20 @@ func (s *chat_service_server) JoinChannel(ctx context.Context, request *pb.UserC
 	}, nil
 }
 
+func removeUserFromChannel(channelId string, userId string) {
+	channel := findChannelById(channelId)
+	if channel == nil {
+		return
+	}
+
+	for i, member := range channel.Members {
+		if member.Id == userId {
+			channel.Members = append(channel.Members[:i], channel.Members[i+1:]...)
+			break
+		}
+	}
+}
+
 func broadcastMessageToChannel(msg *pb.ChatMessage) {
 	for _, clientStream := range activeStreams[msg.ChannelId] {
 		err := clientStream.Send(msg)
@@ -181,6 +195,8 @@ func (s *chat_service_server) StartMessaging(stream pb.ChatService_StartMessagin
 			return nil
 		}
 		if err != nil {
+			log.Printf("Logging out user: %s", user.Username)
+			removeUserFromChannel(channel.Id, user.Id)
 			return err
 		}
 
