@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package chat;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "chat.app.internal.service";
+
+message User {
+  string id = 1;
+  string username = 2;
+}
+
+message Channel {
+  string id = 1;
+  string name = 2;
+  repeated User members = 3;
+}
+
+message ChatMessage {
+  string id = 1;
+  string sender_id = 2;
+  string sender_name = 3;
+  string channel_id = 4;
+  string content = 5;
+  google.protobuf.Timestamp sent_at = 6;
+}
+
+message UserChannelRequest {
+  string user_id = 1;
+  string channel_id = 2;
+}
+
+message JoinChannelAck {
+  bool joined = 1;
+  string error_message = 2;
+}
+
+message MessageAck {
+  bool sent = 1;
+  string error_message = 2;
+}
+
+service ChatService {
+  rpc JoinChannel(UserChannelRequest) returns (JoinChannelAck);
+  rpc SendMessage(ChatMessage) returns (MessageAck);
+  rpc StartMessaging(stream ChatMessage) returns (stream ChatMessage);
+}
